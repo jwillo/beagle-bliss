@@ -2,7 +2,7 @@
 
 A delightful web hub for Beagle enthusiasts, offering a photo gallery, curated shop, grooming services, and specialized AI vet advice.
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jwillo/beagle-bliss)
 
 Beagle Bliss is a whimsical, all-in-one web application dedicated to Beagle lovers. It combines a community photo gallery, a curated e-commerce store for Beagle-specific products, a service booking system for grooming, and an AI-powered veterinarian assistant for specialized advice. The platform is designed with a playful, illustrative aesthetic, featuring custom graphics, a warm color palette, and delightful micro-interactions to create an engaging and human-centered experience.
 
@@ -107,7 +107,7 @@ This project is designed for seamless deployment to Cloudflare's global network.
 
 Alternatively, you can deploy directly from your GitHub repository using the button below.
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jwillo/beagle-bliss)
 
 ## 📂 Project Structure
 
