@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { PawPrint, Menu, ShoppingCart } from 'lucide-react';
+import { PawPrint, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useCartStore } from '@/stores/cartStore';
 const navLinks = [
   { name: 'Home', path: '/' },
   { name: 'Gallery', path: '/gallery' },
@@ -15,8 +13,6 @@ const navLinks = [
 ];
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const openCart = useCartStore(s => s.openCart);
-  const totalItems = useCartStore(s => s.totalItems());
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
       "text-lg font-medium transition-colors duration-300 hover:text-beagle-coral",
@@ -36,38 +32,28 @@ export function Header() {
             </NavLink>
           ))}
         </nav>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="relative" onClick={openCart}>
-            <ShoppingCart className="h-6 w-6 text-beagle-brown" />
-            {totalItems > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0 bg-beagle-coral text-white">
-                {totalItems}
-              </Badge>
-            )}
-          </Button>
-          <div className="md:hidden">
-            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6 text-beagle-brown" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="bg-beagle-beige">
-                <div className="flex flex-col items-center justify-center h-full space-y-8">
-                  {navLinks.map((link) => (
-                    <NavLink
-                      key={link.name}
-                      to={link.path}
-                      className={linkClass}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <span className="text-2xl">{link.name}</span>
-                    </NavLink>
-                  ))}
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+        <div className="md:hidden">
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6 text-beagle-brown" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="bg-beagle-beige">
+              <div className="flex flex-col items-center justify-center h-full space-y-8">
+                {navLinks.map((link) => (
+                  <NavLink
+                    key={link.name}
+                    to={link.path}
+                    className={linkClass}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <span className="text-2xl">{link.name}</span>
+                  </NavLink>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

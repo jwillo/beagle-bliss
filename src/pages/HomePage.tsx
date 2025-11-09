@@ -1,148 +1,160 @@
-// Home page of the app, Currently a demo page for demonstration.
-// Please rewrite this file to implement your own logic. Do not replace or delete it, simply rewrite this HomePage.tsx file.
-import { useEffect } from 'react'
-import { Sparkles } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { Toaster, toast } from '@/components/ui/sonner'
-import { create } from 'zustand'
-import { useShallow } from 'zustand/react/shallow'
-import { AppLayout } from '@/components/layout/AppLayout'
-
-// Timer store: independent slice with a clear, minimal API, for demonstration
-type TimerState = {
-  isRunning: boolean;
-  elapsedMs: number;
-  start: () => void;
-  pause: () => void;
-  reset: () => void;
-  tick: (deltaMs: number) => void;
-}
-
-const useTimerStore = create<TimerState>((set) => ({
-  isRunning: false,
-  elapsedMs: 0,
-  start: () => set({ isRunning: true }),
-  pause: () => set({ isRunning: false }),
-  reset: () => set({ elapsedMs: 0, isRunning: false }),
-  tick: (deltaMs) => set((s) => ({ elapsedMs: s.elapsedMs + deltaMs })),
-}))
-
-// Counter store: separate slice to showcase multiple stores without coupling
-type CounterState = {
-  count: number;
-  inc: () => void;
-  reset: () => void;
-}
-
-const useCounterStore = create<CounterState>((set) => ({
-  count: 0,
-  inc: () => set((s) => ({ count: s.count + 1 })),
-  reset: () => set({ count: 0 }),
-}))
-
-function formatDuration(ms: number): string {
-  const total = Math.max(0, Math.floor(ms / 1000))
-  const m = Math.floor(total / 60)
-  const s = total % 60
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
-
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowRight, Heart, ShoppingCart, Scissors, MessageSquare } from 'lucide-react';
+import { galleryImages, products } from '@/lib/data';
 export function HomePage() {
-  // Select only what is needed to avoid unnecessary re-renders
-  const { isRunning, elapsedMs } = useTimerStore(
-    useShallow((s) => ({ isRunning: s.isRunning, elapsedMs: s.elapsedMs })),
-  )
-  const start = useTimerStore((s) => s.start)
-  const pause = useTimerStore((s) => s.pause)
-  const resetTimer = useTimerStore((s) => s.reset)
-  const count = useCounterStore((s) => s.count)
-  const inc = useCounterStore((s) => s.inc)
-  const resetCount = useCounterStore((s) => s.reset)
-
-  // Drive the timer only while running; avoid update-depth issues with a scoped RAF
-  useEffect(() => {
-    if (!isRunning) return
-    let raf = 0
-    let last = performance.now()
-    const loop = () => {
-      const now = performance.now()
-      const delta = now - last
-      last = now
-      // Read store API directly to keep effect deps minimal and stable
-      useTimerStore.getState().tick(delta)
-      raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [isRunning])
-
-  const onPleaseWait = () => {
-    inc()
-    if (!isRunning) {
-      start()
-      toast.success('Building your app…', {
-        description: 'Hang tight, we\'re setting everything up.',
-      })
-    } else {
-      pause()
-      toast.info('Taking a short pause', {
-        description: 'We\'ll continue shortly.',
-      })
-    }
-  }
-
-  const formatted = formatDuration(elapsedMs)
-
   return (
-    <AppLayout>
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground p-4 overflow-hidden relative">
-        <ThemeToggle />
-        <div className="absolute inset-0 bg-gradient-rainbow opacity-10 dark:opacity-20 pointer-events-none" />
-        <div className="text-center space-y-8 relative z-10 animate-fade-in">
-          <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-primary floating">
-              <Sparkles className="w-8 h-8 text-white rotating" />
-            </div>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-balance leading-tight">
-            Creating your <span className="text-gradient">app</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto text-pretty">
-            Your application would be ready soon.
-          </p>
-          <div className="flex justify-center gap-4">
-            <Button 
-              size="lg"
-              onClick={onPleaseWait}
-              className="btn-gradient px-8 py-4 text-lg font-semibold hover:-translate-y-0.5 transition-all duration-200"
-              aria-live="polite"
+    <div className="w-full">
+      {/* Hero Section */}
+      <section className="relative bg-beagle-brown/5 overflow-hidden">
+        <div className="container-padding section-padding">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center md:text-left"
             >
-              Please Wait
-            </Button>
+              <h1 className="font-display text-5xl md:text-7xl text-beagle-brown leading-tight">
+                A Haven for <br /> Beagle Lovers
+              </h1>
+              <p className="mt-6 text-lg text-beagle-brown/80 max-w-md mx-auto md:mx-0">
+                Welcome to Beagle Bliss, the ultimate destination for everything beagle. Share photos, shop curated products, book grooming, and get expert AI vet advice.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Button asChild size="lg" className="bg-beagle-coral hover:bg-beagle-coral/90 text-white shadow-lg transition-transform hover:scale-105">
+                  <NavLink to="/gallery">Explore Gallery <ArrowRight className="ml-2 h-5 w-5" /></NavLink>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="border-beagle-coral text-beagle-coral hover:bg-beagle-coral/10 hover:text-beagle-coral transition-transform hover:scale-105">
+                  <NavLink to="/shop">Shop Now</NavLink>
+                </Button>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative h-80 md:h-auto"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1598875184988-5e67b1a8e4b4?q=80&w=2187&auto=format&fit=crop"
+                alt="Happy Beagle"
+                className="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl transform md:rotate-3"
+              />
+            </motion.div>
           </div>
-          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <div>
-              Time elapsed: <span className="font-medium tabular-nums text-foreground">{formatted}</span>
-            </div>
-            <div>
-              Coins: <span className="font-medium tabular-nums text-foreground">{count}</span>
-            </div>
+        </div>
+      </section>
+      {/* Features Section */}
+      <section className="section-padding container-padding">
+        <div className="text-center mb-16">
+          <h2 className="font-display text-4xl md:text-5xl text-beagle-brown">What We Offer</h2>
+          <p className="mt-4 text-lg text-beagle-brown/70 max-w-2xl mx-auto">
+            Everything your beagle needs for a happy, healthy life, all in one place.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <FeatureCard icon={Heart} title="Photo Gallery" description="Share and admire adorable photos of beagles from our community." link="/gallery" />
+          <FeatureCard icon={ShoppingCart} title="Curated Shop" description="Find the best food, toys, and supplies specifically chosen for beagles." link="/shop" />
+          <FeatureCard icon={Scissors} title="Grooming Services" description="Book professional grooming sessions to keep your beagle looking sharp." link="/services" />
+          <FeatureCard icon={MessageSquare} title="Vet AI Assistant" description="Get instant, helpful advice for your beagle-related questions." link="/vet-ai" />
+        </div>
+      </section>
+      {/* Gallery Preview */}
+      <section className="section-padding bg-beagle-brown/5">
+        <div className="container-padding">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-4xl md:text-5xl text-beagle-brown">Community Gallery</h2>
+            <p className="mt-4 text-lg text-beagle-brown/70">A glimpse of our adorable beagle community.</p>
           </div>
-          <div className="flex justify-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => { resetTimer(); resetCount(); toast('Reset complete') }}>
-              Reset
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => { inc(); toast('Coin added') }}>
-              Add Coin
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {galleryImages.slice(0, 4).map((img, i) => (
+              <motion.div
+                key={img.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="aspect-square"
+              >
+                <img src={img.src} alt={img.alt} className="w-full h-full object-cover rounded-2xl shadow-lg" />
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <Button asChild size="lg" variant="outline" className="border-beagle-brown text-beagle-brown hover:bg-beagle-brown/10 hover:text-beagle-brown transition-transform hover:scale-105">
+              <NavLink to="/gallery">View More <ArrowRight className="ml-2 h-5 w-5" /></NavLink>
             </Button>
           </div>
         </div>
-        <footer className="absolute bottom-8 text-center text-muted-foreground/80">
-          <p>Powered by Cloudflare</p>
-        </footer>
-        <Toaster richColors closeButton />
-      </div>
-    </AppLayout>
-  )
+      </section>
+      {/* Shop Preview */}
+      <section className="section-padding container-padding">
+        <div className="text-center mb-12">
+          <h2 className="font-display text-4xl md:text-5xl text-beagle-brown">Featured Products</h2>
+          <p className="mt-4 text-lg text-beagle-brown/70">Our top picks for your beloved beagle.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.slice(0, 3).map((product, i) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+            >
+              <Card className="overflow-hidden h-full flex flex-col group">
+                <div className="overflow-hidden">
+                  <img src={product.image} alt={product.name} className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" />
+                </div>
+                <CardContent className="p-6 flex-grow flex flex-col">
+                  <h3 className="text-xl font-bold text-beagle-brown">{product.name}</h3>
+                  <p className="text-beagle-brown/70 mt-2 flex-grow">{product.description}</p>
+                  <div className="flex justify-between items-center mt-4">
+                    <span className="text-2xl font-bold text-beagle-coral">${product.price}</span>
+                    <Button className="bg-beagle-coral hover:bg-beagle-coral/90 text-white">Add to Cart</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+        <div className="text-center mt-12">
+          <Button asChild size="lg" className="bg-beagle-coral hover:bg-beagle-coral/90 text-white shadow-lg transition-transform hover:scale-105">
+            <NavLink to="/shop">Visit Shop <ArrowRight className="ml-2 h-5 w-5" /></NavLink>
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+}
+interface FeatureCardProps {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  link: string;
+}
+function FeatureCard({ icon: Icon, title, description, link }: FeatureCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card className="p-8 text-center h-full hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+        <div className="inline-block p-4 bg-beagle-coral/20 rounded-full mb-4">
+          <Icon className="h-8 w-8 text-beagle-coral" />
+        </div>
+        <h3 className="text-2xl font-bold text-beagle-brown">{title}</h3>
+        <p className="mt-2 text-beagle-brown/70">{description}</p>
+        <Button asChild variant="link" className="mt-4 text-beagle-coral">
+          <NavLink to={link}>Learn More <ArrowRight className="ml-1 h-4 w-4" /></NavLink>
+        </Button>
+      </Card>
+    </motion.div>
+  );
 }

@@ -13,7 +13,11 @@ export default {
   				'Roboto',
   				'sans-serif'
   			],
-  			display: [
+        display: [
+          'Fredericka the Great',
+          'sans-serif'
+        ],
+  			brand: [
   				'Cal Sans',
   				'Inter',
   				'system-ui',
@@ -91,6 +95,9 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+        'beagle-brown': '#A0522D',
+        'beagle-beige': '#F5F5DC',
+        'beagle-coral': '#FF7F50',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			muted: {

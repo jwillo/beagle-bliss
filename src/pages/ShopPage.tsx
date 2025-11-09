@@ -5,16 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { products } from '@/lib/data';
-import { useCartStore, Product } from '@/stores/cartStore';
-import { toast } from 'sonner';
 export function ShopPage() {
-  const addItem = useCartStore(s => s.addItem);
-  const openCart = useCartStore(s => s.openCart);
-  const handleAddToCart = (product: Product) => {
-    addItem(product);
-    toast.success(`${product.name} added to cart!`);
-    openCart();
-  };
   return (
     <div className="container-padding section-padding">
       <motion.div
@@ -50,7 +41,7 @@ export function ShopPage() {
                 <p className="text-beagle-brown/70 mt-2 flex-grow">{product.description}</p>
                 <div className="flex justify-between items-center mt-6">
                   <span className="text-2xl font-bold text-beagle-coral">${product.price.toFixed(2)}</span>
-                  <Button onClick={() => handleAddToCart(product)} className="bg-beagle-coral hover:bg-beagle-coral/90 text-white">
+                  <Button className="bg-beagle-coral hover:bg-beagle-coral/90 text-white">
                     <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
                   </Button>
                 </div>
