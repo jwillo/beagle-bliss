@@ -1,10 +1,49 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { galleryImages } from '@/lib/data';
+import { galleryImages as initialImages } from '@/lib/data';
+import { toast } from 'sonner';
+interface UploadedImage {
+  id: string;
+  src: string;
+  alt: string;
+}
 export function GalleryPage() {
+  const [userImages, setUserImages] = useState<UploadedImage[]>([]);
+  const singleFileInputRef = useRef<HTMLInputElement>(null);
+  const bulkFileInputRef = useRef<HTMLInputElement>(null);
+  const allImages = [...userImages, ...initialImages];
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, multiple: boolean) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    const newImages: UploadedImage[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.type.startsWith('image/')) {
+        newImages.push({
+          id: `user-${Date.now()}-${i}`,
+          src: URL.createObjectURL(file),
+          alt: file.name,
+        });
+      } else {
+        toast.error(`File "${file.name}" is not a valid image.`);
+      }
+    }
+    setUserImages(prev => [...newImages, ...prev]);
+    if (newImages.length > 0) {
+      toast.success(`${newImages.length} image(s) added to the gallery!`);
+    }
+    // Reset file input value to allow re-uploading the same file
+    event.target.value = '';
+  };
+  useEffect(() => {
+    // Cleanup object URLs on component unmount
+    return () => {
+      userImages.forEach(image => URL.revokeObjectURL(image.src));
+    };
+  }, [userImages]);
   return (
     <div className="container-padding section-padding">
       <motion.div
@@ -35,14 +74,16 @@ export function GalleryPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <Button className="bg-beagle-coral hover:bg-beagle-coral/90 text-white shadow-lg">Upload Photo</Button>
-              <Button variant="outline" className="border-beagle-coral text-beagle-coral hover:bg-beagle-coral/10">Upload in Bulk</Button>
+              <input type="file" accept="image/*" ref={singleFileInputRef} onChange={(e) => handleFileChange(e, false)} className="hidden" />
+              <input type="file" accept="image/*" ref={bulkFileInputRef} onChange={(e) => handleFileChange(e, true)} className="hidden" multiple />
+              <Button onClick={() => singleFileInputRef.current?.click()} className="bg-beagle-coral hover:bg-beagle-coral/90 text-white shadow-lg">Upload Photo</Button>
+              <Button onClick={() => bulkFileInputRef.current?.click()} variant="outline" className="border-beagle-coral text-beagle-coral hover:bg-beagle-coral/10">Upload in Bulk</Button>
             </div>
           </div>
         </Card>
       </motion.div>
       <div className="mt-16 columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-        {galleryImages.map((image, index) => (
+        {allImages.map((image, index) => (
           <motion.div
             key={image.id}
             initial={{ opacity: 0, scale: 0.9 }}

@@ -5,7 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Heart, ShoppingCart, Scissors, MessageSquare } from 'lucide-react';
 import { galleryImages, products } from '@/lib/data';
+import { useCartStore, Product } from '@/stores/cartStore';
+import { toast } from 'sonner';
 export function HomePage() {
+  const addItem = useCartStore(s => s.addItem);
+  const openCart = useCartStore(s => s.openCart);
+  const handleAddToCart = (product: Product) => {
+    addItem(product);
+    toast.success(`${product.name} added to cart!`);
+    openCart();
+  };
   return (
     <div className="w-full">
       {/* Hero Section */}
@@ -37,7 +46,7 @@ export function HomePage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative h-80 md:h-auto"
+              className="relative h-80 md:h-auto aspect-[4/3]"
             >
               <img
                 src="https://images.unsplash.com/photo-1598875184988-5e67b1a8e4b4?q=80&w=2187&auto=format&fit=crop"
@@ -115,7 +124,7 @@ export function HomePage() {
                   <p className="text-beagle-brown/70 mt-2 flex-grow">{product.description}</p>
                   <div className="flex justify-between items-center mt-4">
                     <span className="text-2xl font-bold text-beagle-coral">${product.price}</span>
-                    <Button className="bg-beagle-coral hover:bg-beagle-coral/90 text-white">Add to Cart</Button>
+                    <Button onClick={() => handleAddToCart(product)} className="bg-beagle-coral hover:bg-beagle-coral/90 text-white">Add to Cart</Button>
                   </div>
                 </CardContent>
               </Card>
